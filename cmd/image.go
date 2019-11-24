@@ -1,5 +1,5 @@
 /*
-Copyright © 2019 NAME HERE <EMAIL ADDRESS>
+Copyright © 2019 John Claro <jkrclaro@gmail.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,16 +21,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// imageCmd represents the image command
 var imageCmd = &cobra.Command{
 	Use:   "image",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("image called")
 	},
@@ -39,13 +33,8 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(imageCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// imageCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// imageCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	imageCmd.PersistentFlags().String("source", "", "Filepath of image")
+	imageCmd.MarkFlagRequired("source")
+	imageCmd.PersistentFlags().String("target", "", "Target folder")
+	imageCmd.MarkFlagRequired("target")
 }
