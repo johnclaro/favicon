@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"path/filepath"
 
@@ -31,7 +30,6 @@ var imageCmd = &cobra.Command{
 	Long: `Convert an image that you want to use as your favicon then use this 
 	tool to convert an image to its favicon formats.`,
 	Args: func(cmd *cobra.Command, args []string) error {
-		fmt.Println(len(args))
 		if len(args) < 2 {
 			return errors.New("Requires `source` and `target`")
 		}
@@ -64,8 +62,10 @@ var imageCmd = &cobra.Command{
 			"favicon-128.png":              128,
 			"favicon-196x196.png":          196,
 			"mstile-70x70.png":             70,
+			"ms-title-144x144.png":         144,
 			"mstile-150x150.png":           150,
 			"mstile-310x310.png":           310,
+			"favicon.ico":                  64,
 			// TODO: "mstile-310x150.png":
 		}
 
