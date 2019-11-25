@@ -105,7 +105,13 @@ var imageCmd = &cobra.Command{
 				if err != nil {
 					log.Fatalf("Failed to open image: %v", err)
 				}
-				imagefile = imaging.Resize(imagefile, dimension.height, dimension.width, imaging.Lanczos)
+
+				imagefile = imaging.Resize(
+					imagefile,
+					dimension.height,
+					dimension.width,
+					imaging.Lanczos,
+				)
 				err = imaging.Save(imagefile, filepath)
 				if err != nil {
 					log.Fatalf("Failed to save image: %v", err)
