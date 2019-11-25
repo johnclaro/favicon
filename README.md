@@ -17,3 +17,12 @@ brand [command]
 # Run `--help` for detailed information about CLI commands
 brand [command] help
 ```
+
+## Get started
+
+For this tutorial, we want to convert `logo.png` into its favicon formats.
+Simply run the command below and open up the `output` folder
+
+```
+brand image logo.png output/
+```
