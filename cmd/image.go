@@ -31,6 +31,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type dimension struct {
+	height, width int
+}
+
 var imageCmd = &cobra.Command{
 	Use:   "image",
 	Short: "Convert an image to its favicon formats.",
@@ -49,26 +53,26 @@ var imageCmd = &cobra.Command{
 		source := args[0]
 		target := args[1]
 
-		files := map[string]int{
-			"apple-touch-icon-57x57.png":   57,
-			"apple-touch-icon-60x60.png":   60,
-			"apple-touch-icon-72x72.png":   72,
-			"apple-touch-icon-76x76.png":   76,
-			"apple-touch-icon-114x114.png": 114,
-			"apple-touch-icon-120x120.png": 120,
-			"apple-touch-icon-144x144.png": 144,
-			"apple-touch-icon-152x152.png": 152,
-			"favicon-16x16.png":            16,
-			"favicon-32x32.png":            32,
-			"favicon-96x96.png":            96,
-			"favicon-128.png":              128,
-			"favicon-196x196.png":          196,
-			"mstile-70x70.png":             70,
-			"ms-title-144x144.png":         144,
-			"mstile-150x150.png":           150,
-			"mstile-310x310.png":           310,
-			"favicon.ico":                  64,
-			// TODO: "mstile-310x150.png":
+		files := map[string]dimension{
+			"apple-touch-icon-57x57.png":   dimension{height: 50, width: 50},
+			"apple-touch-icon-60x60.png":   dimension{height: 60, width: 60},
+			"apple-touch-icon-72x72.png":   dimension{height: 72, width: 72},
+			"apple-touch-icon-76x76.png":   dimension{height: 76, width: 76},
+			"apple-touch-icon-114x114.png": dimension{height: 114, width: 114},
+			"apple-touch-icon-120x120.png": dimension{height: 120, width: 120},
+			"apple-touch-icon-144x144.png": dimension{height: 144, width: 144},
+			"apple-touch-icon-152x152.png": dimension{height: 152, width: 152},
+			"favicon-16x16.png":            dimension{height: 16, width: 16},
+			"favicon-32x32.png":            dimension{height: 32, width: 32},
+			"favicon-96x96.png":            dimension{height: 96, width: 96},
+			"favicon-128.png":              dimension{height: 128, width: 128},
+			"favicon-196x196.png":          dimension{height: 196, width: 196},
+			"mstile-70x70.png":             dimension{height: 70, width: 70},
+			"ms-title-144x144.png":         dimension{height: 144, width: 144},
+			"mstile-150x150.png":           dimension{height: 150, width: 150},
+			"mstile-310x310.png":           dimension{height: 310, width: 310},
+			"favicon.ico":                  dimension{height: 64, width: 64},
+			"mstile-310x150.png":           dimension{height: 310, width: 150},
 		}
 
 		for filename, dimension := range files {
@@ -101,7 +105,7 @@ var imageCmd = &cobra.Command{
 				if err != nil {
 					log.Fatalf("Failed to open image: %v", err)
 				}
-				imagefile = imaging.Resize(imagefile, dimension, dimension, imaging.Lanczos)
+				imagefile = imaging.Resize(imagefile, dimension.height, dimension.width, imaging.Lanczos)
 				err = imaging.Save(imagefile, filepath)
 				if err != nil {
 					log.Fatalf("Failed to save image: %v", err)
