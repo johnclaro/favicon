@@ -20,9 +20,9 @@ brand [command] help
 
 ## Get started
 
-For this tutorial, we want to convert `logo.png` into its favicon formats.
-Simply run the command below and open up the `output` folder
+For this tutorial, we want to generate the favicon formats of `logo.png` in
+our current path.
 
 ```sh-session
-brand image logo.png output/
+brand image logo.png .
 ```
