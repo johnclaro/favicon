@@ -16,6 +16,8 @@ limitations under the License.
 package cmd
 
 import (
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/disintegration/imaging"
@@ -24,12 +26,21 @@ import (
 
 var imageCmd = &cobra.Command{
 	Use:   "image",
-	Short: "A brief description of your command",
-	Long:  "TODO",
-	Args:  cobra.MaximumNArgs(2),
+	Short: "Convert an image to its favicon formats.",
+	Long: `Convert an image that you want to use for your
+	favicon then use this tool to convert an image to its favicon formats.`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		fmt.Println(len(args))
+		if len(args) < 2 {
+			return errors.New("Requires `source` and `target`")
+		}
+		if len(args) >= 3 {
+			return errors.New("Too many arguments provided")
+		}
+		return nil
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		source := args[0]
-
 		src, err := imaging.Open(source)
 		if err != nil {
 			log.Fatalf("Failed to open image: %v", err)
@@ -41,12 +52,8 @@ var imageCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("Failed to save image: %v", err)
 		}
-
 	},
 }
-
-var source string
-var target string
 
 func init() {
 	rootCmd.AddCommand(imageCmd)
