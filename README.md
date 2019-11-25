@@ -23,6 +23,6 @@ brand [command] help
 For this tutorial, we want to convert `logo.png` into its favicon formats.
 Simply run the command below and open up the `output` folder
 
-```
+```sh-session
 brand image logo.png output/
 ```
