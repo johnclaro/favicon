@@ -16,13 +16,99 @@ limitations under the License.
 package cmd
 
 import (
+	"bufio"
+	"bytes"
+	"encoding/binary"
 	"errors"
+	"fmt"
+	"image"
+	"image/draw"
+	"image/png"
+	"io"
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/disintegration/imaging"
 	"github.com/spf13/cobra"
 )
+
+// MediaFile TODO
+type MediaFile struct {
+	filepath string
+}
+
+type iconDir struct {
+	reserved  uint16
+	imageType uint16
+	numImages uint16
+}
+
+type iconDirEntry struct {
+	imageWidth   uint8
+	imageHeight  uint8
+	numColors    uint8
+	reserved     uint8
+	colorPlanes  uint16
+	bitsPerPixel uint16
+	sizeInBytes  uint32
+	offset       uint32
+}
+
+func newIconDir() iconDir {
+	var id iconDir
+	id.imageType = 1
+	id.numImages = 1
+	return id
+}
+
+func newIconDirEntry() iconDirEntry {
+	var ide iconDirEntry
+	ide.colorPlanes = 1
+	ide.bitsPerPixel = 32
+	ide.offset = 22
+	return ide
+}
+
+// OpenPNG TODO
+func (media MediaFile) OpenPNG() (image.Image, error) {
+	file, err := os.Open(media.filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+	return png.Decode(file)
+}
+
+// SaveAsICO TODO
+func (media MediaFile) SaveAsICO(writerICO io.Writer, pngFile image.Image) string {
+	pngFileBounds := pngFile.Bounds()
+	newRGBA := image.NewRGBA(pngFileBounds)
+	draw.Draw(newRGBA, pngFileBounds, pngFile, pngFileBounds.Min, draw.Src)
+
+	id := newIconDir()
+	ide := newIconDirEntry()
+
+	pngBytesBuffer := new(bytes.Buffer)
+	pngWriter := bufio.NewWriter(pngBytesBuffer)
+	png.Encode(pngWriter, newRGBA)
+	pngWriter.Flush()
+	ide.sizeInBytes = uint32(len(pngBytesBuffer.Bytes()))
+
+	newRGBABounds := newRGBA.Bounds()
+	ide.imageWidth = uint8(newRGBABounds.Dx())
+	ide.imageHeight = uint8(newRGBABounds.Dy())
+	bytesBuffer := new(bytes.Buffer)
+
+	binary.Write(bytesBuffer, binary.LittleEndian, id)
+	binary.Write(bytesBuffer, binary.LittleEndian, ide)
+
+	writerICO.Write(bytesBuffer.Bytes())
+	writerICO.Write(pngBytesBuffer.Bytes())
+
+	return "Done"
+}
 
 var imageCmd = &cobra.Command{
 	Use:   "image",
@@ -41,11 +127,6 @@ var imageCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		source := args[0]
 		target := args[1]
-
-		src, err := imaging.Open(source)
-		if err != nil {
-			log.Fatalf("Failed to open image: %v", err)
-		}
 
 		files := map[string]int{
 			"apple-touch-icon-57x57.png":   57,
@@ -71,10 +152,26 @@ var imageCmd = &cobra.Command{
 
 		for filename, dimension := range files {
 			filepath := filepath.Join(target, filename)
-			src = imaging.Resize(src, dimension, dimension, imaging.Lanczos)
-			err = imaging.Save(src, filepath)
-			if err != nil {
-				log.Fatalf("Failed to save image: %v", err)
+
+			if filename == "favicon.ico" {
+				mediafile := MediaFile{filepath: source}
+				pngFile, err := mediafile.OpenPNG()
+				if err != nil {
+					fmt.Println("Error")
+				}
+				writerICO, _ := os.Create(filepath)
+				defer writerICO.Close()
+				mediafile.SaveAsICO(writerICO, pngFile)
+			} else {
+				imagefile, err := imaging.Open(source)
+				if err != nil {
+					log.Fatalf("Failed to open image: %v", err)
+				}
+				imagefile = imaging.Resize(imagefile, dimension, dimension, imaging.Lanczos)
+				err = imaging.Save(imagefile, filepath)
+				if err != nil {
+					log.Fatalf("Failed to save image: %v", err)
+				}
 			}
 		}
 	},
