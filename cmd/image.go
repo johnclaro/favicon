@@ -19,6 +19,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/disintegration/imaging"
 	"github.com/spf13/cobra"
@@ -41,6 +42,8 @@ var imageCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		source := args[0]
+		target := args[1]
+
 		src, err := imaging.Open(source)
 		if err != nil {
 			log.Fatalf("Failed to open image: %v", err)
@@ -67,7 +70,7 @@ var imageCmd = &cobra.Command{
 		}
 
 		for filename, dimension := range files {
-			filepath := "./test/" + filename
+			filepath := filepath.Join(target, filename)
 			src = imaging.Resize(src, dimension, dimension, imaging.Lanczos)
 			err = imaging.Save(src, filepath)
 			if err != nil {
