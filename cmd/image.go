@@ -23,7 +23,6 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,38 +30,6 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/spf13/cobra"
 )
-
-// MediaFile TODO
-type MediaFile struct {
-	filepath string
-}
-
-// OpenPNG TODO
-func (media MediaFile) OpenPNG() (image.Image, error) {
-	file, err := os.Open(media.filepath)
-	if err != nil {
-		return nil, err
-	}
-
-	defer file.Close()
-	return png.Decode(file)
-}
-
-// SaveAsICO TODO
-func (media MediaFile) SaveAsICO(writerICO io.Writer, pngFile image.Image) string {
-	pngFileBounds := pngFile.Bounds()
-	newRGBA := image.NewRGBA(pngFileBounds)
-	draw.Draw(newRGBA, pngFileBounds, pngFile, pngFileBounds.Min, draw.Src)
-
-	pngBytesBuffer := new(bytes.Buffer)
-	pngWriter := bufio.NewWriter(pngBytesBuffer)
-	png.Encode(pngWriter, newRGBA)
-	pngWriter.Flush()
-
-	writerICO.Write(pngBytesBuffer.Bytes())
-
-	return "Done"
-}
 
 var imageCmd = &cobra.Command{
 	Use:   "image",
@@ -108,14 +75,27 @@ var imageCmd = &cobra.Command{
 			filepath := filepath.Join(target, filename)
 
 			if filename == "favicon.ico" {
-				mediafile := MediaFile{filepath: source}
-				pngFile, err := mediafile.OpenPNG()
+				file, err := os.Open(source)
 				if err != nil {
-					fmt.Println("Error")
+					fmt.Println(err)
 				}
+				defer file.Close()
+
+				pngFile, err := png.Decode(file)
+				if err != nil {
+					fmt.Println(err)
+				}
+
 				writerICO, _ := os.Create(filepath)
 				defer writerICO.Close()
-				mediafile.SaveAsICO(writerICO, pngFile)
+				bounds := pngFile.Bounds()
+				rgba := image.NewRGBA(bounds)
+				draw.Draw(rgba, bounds, pngFile, bounds.Min, draw.Src)
+				buffer := new(bytes.Buffer)
+				pngWriter := bufio.NewWriter(buffer)
+				png.Encode(pngWriter, rgba)
+				pngWriter.Flush()
+				writerICO.Write(buffer.Bytes())
 			} else {
 				imagefile, err := imaging.Open(source)
 				if err != nil {
