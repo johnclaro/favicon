@@ -26,7 +26,7 @@ var imageCmd = &cobra.Command{
 	Short: "A brief description of your command",
 	Long:  "TODO",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("image called")
+		fmt.Println(args)
 	},
 }
 

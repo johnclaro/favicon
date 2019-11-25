@@ -1,5 +1,9 @@
-module github.com/jkrclaro/nuke
+module github.com/jkrclaro/brand
 
 go 1.13
 
-require github.com/jkrclaro/brand v0.0.0-20191124231459-489271e48740
+require (
+	github.com/mitchellh/go-homedir v1.1.0
+	github.com/spf13/cobra v0.0.5
+	github.com/spf13/viper v1.5.0
+)
