@@ -16,8 +16,9 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
+	"log"
 
+	"github.com/disintegration/imaging"
 	"github.com/spf13/cobra"
 )
 
@@ -25,16 +26,28 @@ var imageCmd = &cobra.Command{
 	Use:   "image",
 	Short: "A brief description of your command",
 	Long:  "TODO",
+	Args:  cobra.MaximumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(args)
+		source := args[0]
+
+		src, err := imaging.Open(source)
+		if err != nil {
+			log.Fatalf("Failed to open image: %v", err)
+		}
+
+		src = imaging.Resize(src, 16, 16, imaging.Lanczos)
+
+		err = imaging.Save(src, "output.png")
+		if err != nil {
+			log.Fatalf("Failed to save image: %v", err)
+		}
+
 	},
 }
 
+var source string
+var target string
+
 func init() {
 	rootCmd.AddCommand(imageCmd)
-
-	imageCmd.PersistentFlags().String("source", "", "Filepath of image")
-	imageCmd.MarkFlagRequired("source")
-	imageCmd.PersistentFlags().String("target", "", "Target folder")
-	imageCmd.MarkFlagRequired("target")
 }
