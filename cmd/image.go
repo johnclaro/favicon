@@ -18,7 +18,6 @@ package cmd
 import (
 	"bufio"
 	"bytes"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"image"
@@ -38,38 +37,6 @@ type MediaFile struct {
 	filepath string
 }
 
-type iconDir struct {
-	reserved  uint16
-	imageType uint16
-	numImages uint16
-}
-
-type iconDirEntry struct {
-	imageWidth   uint8
-	imageHeight  uint8
-	numColors    uint8
-	reserved     uint8
-	colorPlanes  uint16
-	bitsPerPixel uint16
-	sizeInBytes  uint32
-	offset       uint32
-}
-
-func newIconDir() iconDir {
-	var id iconDir
-	id.imageType = 1
-	id.numImages = 1
-	return id
-}
-
-func newIconDirEntry() iconDirEntry {
-	var ide iconDirEntry
-	ide.colorPlanes = 1
-	ide.bitsPerPixel = 32
-	ide.offset = 22
-	return ide
-}
-
 // OpenPNG TODO
 func (media MediaFile) OpenPNG() (image.Image, error) {
 	file, err := os.Open(media.filepath)
@@ -87,24 +54,11 @@ func (media MediaFile) SaveAsICO(writerICO io.Writer, pngFile image.Image) strin
 	newRGBA := image.NewRGBA(pngFileBounds)
 	draw.Draw(newRGBA, pngFileBounds, pngFile, pngFileBounds.Min, draw.Src)
 
-	id := newIconDir()
-	ide := newIconDirEntry()
-
 	pngBytesBuffer := new(bytes.Buffer)
 	pngWriter := bufio.NewWriter(pngBytesBuffer)
 	png.Encode(pngWriter, newRGBA)
 	pngWriter.Flush()
-	ide.sizeInBytes = uint32(len(pngBytesBuffer.Bytes()))
 
-	newRGBABounds := newRGBA.Bounds()
-	ide.imageWidth = uint8(newRGBABounds.Dx())
-	ide.imageHeight = uint8(newRGBABounds.Dy())
-	bytesBuffer := new(bytes.Buffer)
-
-	binary.Write(bytesBuffer, binary.LittleEndian, id)
-	binary.Write(bytesBuffer, binary.LittleEndian, ide)
-
-	writerICO.Write(bytesBuffer.Bytes())
 	writerICO.Write(pngBytesBuffer.Bytes())
 
 	return "Done"
