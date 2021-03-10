@@ -1,28 +1,27 @@
-# brand
+# favicon
 A command-line tool for generating favicons from an image
 
 ## Installation
 
 ```
-go install
+go get
 ```
 
 ## Usage
 
-Installing the CLI provides access to the `brand` command.
+Installing the CLI provides access to the `favicon` command.
 
 ```sh-session
-brand [command]
+favicon [command]
 
 # Run `--help` for detailed information about CLI commands
-brand [command] help
+favicon [command] help
 ```
 
 ## Get started
 
-For this tutorial, we want to generate the favicon formats of `logo.png` in
-our current path.
+Generate the favicon formats of `logo.png`
 
 ```sh-session
-brand image logo.png .
+favicon image logo.png .
 ```
