@@ -31,8 +31,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type dimension struct {
+type favicon struct {
 	height, width int
+	name, tag string
 }
 
 var imageCmd = &cobra.Command{
@@ -53,29 +54,29 @@ var imageCmd = &cobra.Command{
 		source := args[0]
 		target := args[1]
 
-		files := map[string]dimension{
-			"apple-touch-icon-57x57.png":   dimension{height: 50, width: 50},
-			"apple-touch-icon-60x60.png":   dimension{height: 60, width: 60},
-			"apple-touch-icon-72x72.png":   dimension{height: 72, width: 72},
-			"apple-touch-icon-76x76.png":   dimension{height: 76, width: 76},
-			"apple-touch-icon-114x114.png": dimension{height: 114, width: 114},
-			"apple-touch-icon-120x120.png": dimension{height: 120, width: 120},
-			"apple-touch-icon-144x144.png": dimension{height: 144, width: 144},
-			"apple-touch-icon-152x152.png": dimension{height: 152, width: 152},
-			"favicon-16x16.png":            dimension{height: 16, width: 16},
-			"favicon-32x32.png":            dimension{height: 32, width: 32},
-			"favicon-96x96.png":            dimension{height: 96, width: 96},
-			"favicon-128.png":              dimension{height: 128, width: 128},
-			"favicon-196x196.png":          dimension{height: 196, width: 196},
-			"mstile-70x70.png":             dimension{height: 70, width: 70},
-			"ms-title-144x144.png":         dimension{height: 144, width: 144},
-			"mstile-150x150.png":           dimension{height: 150, width: 150},
-			"mstile-310x310.png":           dimension{height: 310, width: 310},
-			"favicon.ico":                  dimension{height: 64, width: 64},
-			"mstile-310x150.png":           dimension{height: 310, width: 150},
+		files := map[string]favicon{
+			"apple-touch-icon-57x57.png":   favicon{height: 50, width: 50, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-60x60.png":   favicon{height: 60, width: 60, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-72x72.png":   favicon{height: 72, width: 72, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-76x76.png":   favicon{height: 76, width: 76, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-114x114.png": favicon{height: 114, width: 114, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-120x120.png": favicon{height: 120, width: 120, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-144x144.png": favicon{height: 144, width: 144, name: "apple-touch-icon-precomposed", tag: "link"},
+			"apple-touch-icon-152x152.png": favicon{height: 152, width: 152, name: "apple-touch-icon-precomposed", tag: "link"},
+			"favicon-16x16.png":            favicon{height: 16, width: 16, name: "icon", tag: "link"},
+			"favicon-32x32.png":            favicon{height: 32, width: 32, name: "icon", tag: "link"},
+			"favicon-96x96.png":            favicon{height: 96, width: 96, name: "icon", tag: "link"},
+			"favicon-128.png":              favicon{height: 128, width: 128, name: "icon", tag: "link"},
+			"favicon-196x196.png":          favicon{height: 196, width: 196, name: "icon", tag: "link"},
+			"mstile-70x70.png":             favicon{height: 70, width: 70, name: "msapplication-square70x70logo", tag: "meta"},
+			"ms-title-144x144.png":         favicon{height: 144, width: 144, name: "msapplication-TileImage", tag: "meta"},
+			"mstile-150x150.png":           favicon{height: 150, width: 150, name: "msapplication-wide150x150logo", tag: "meta"},
+			"mstile-310x310.png":           favicon{height: 310, width: 310, name: "msapplication-wide310x310logo", tag: "meta"},
+			"favicon.ico":                  favicon{height: 64, width: 64, name: "shortcut icon", tag: "meta"},
+			"mstile-310x150.png":           favicon{height: 310, width: 150, name: "msapplication-wide310x150logo", tag: "meta"},
 		}
 
-		for filename, dimension := range files {
+		for filename, favicon := range files {
 			filepath := filepath.Join(target, filename)
 
 			if filename == "favicon.ico" {
@@ -108,11 +109,12 @@ var imageCmd = &cobra.Command{
 
 				imagefile = imaging.Resize(
 					imagefile,
-					dimension.height,
-					dimension.width,
+					favicon.height,
+					favicon.width,
 					imaging.Lanczos,
 				)
 				err = imaging.Save(imagefile, filepath)
+				fmt.Println(favicon.name, favicon.tag)
 				if err != nil {
 					log.Fatalf("Failed to save image: %v", err)
 				}
