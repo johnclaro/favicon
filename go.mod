@@ -1,4 +1,4 @@
-module github.com/jkrclaro/favicon
+module github.com/johnclaro/favicon
 
 go 1.13
 
