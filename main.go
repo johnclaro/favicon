@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/jkrclaro/brand/cmd"
+import "github.com/jkrclaro/favicon/cmd"
 
 func main() {
   cmd.Execute()

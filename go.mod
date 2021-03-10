@@ -1,4 +1,4 @@
-module github.com/jkrclaro/brand
+module github.com/jkrclaro/favicon
 
 go 1.13
 
