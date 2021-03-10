@@ -114,7 +114,6 @@ var imageCmd = &cobra.Command{
 					imaging.Lanczos,
 				)
 				err = imaging.Save(imagefile, filepath)
-				fmt.Println(favicon.name, favicon.tag)
 				if err != nil {
 					log.Fatalf("Failed to save image: %v", err)
 				}
